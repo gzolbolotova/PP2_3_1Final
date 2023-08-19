@@ -30,18 +30,6 @@ public class AppConfig {
         this.environment = environment;
     }
 
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(){
-        LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean
-                = new LocalContainerEntityManagerFactoryBean();
-        localContainerEntityManagerFactoryBean.setDataSource(dataSource());
-        localContainerEntityManagerFactoryBean.setPackagesToScan("web");
-        JpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-        localContainerEntityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter);
-        localContainerEntityManagerFactoryBean.setJpaProperties(getProperties());
-        return localContainerEntityManagerFactoryBean;
-    }
-
 
     @Bean
     public DataSource dataSource(){
@@ -53,11 +41,24 @@ public class AppConfig {
         return dataSource;
 
     }
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(){
+        LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean
+                = new LocalContainerEntityManagerFactoryBean();
+        localContainerEntityManagerFactoryBean.setDataSource(dataSource());
+        localContainerEntityManagerFactoryBean.setPackagesToScan("web");
+        localContainerEntityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        localContainerEntityManagerFactoryBean.setJpaProperties(getProperties());
+        return localContainerEntityManagerFactoryBean;
+    }
+
+
+
 
     @Bean
-    public PlatformTransactionManager platformTransactionManager(){
+    public PlatformTransactionManager platformTransactionManager(EntityManagerFactory entityManagerFactory){
         JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-        jpaTransactionManager.setEntityManagerFactory(entityManagerFactoryBean().getObject());
+        jpaTransactionManager.setEntityManagerFactory(entityManagerFactory);
         return jpaTransactionManager;
     }
 
